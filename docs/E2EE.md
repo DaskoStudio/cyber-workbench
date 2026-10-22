@@ -1,0 +1,9 @@
+# Décision E2EE
+
+Choix autorisé : phrase secrète distincte du compte et clé de récupération exportable. Sans phrase ou clé, les données sont irrécupérables. Aucun support serveur ne peut réinitialiser leur chiffrement.
+
+Le navigateur crée une clé de données AES-256-GCM aléatoire par sauvegarde. PBKDF2-SHA256 (600 000 itérations, sel 16 octets) dérive une clé depuis une phrase d’au moins 12 caractères. La clé de données est enveloppée par cette clé et par une seconde clé aléatoire de récupération, exportée au poste. Trois IV indépendants de 12 octets ; format v1 fixe et AAD lie les opérations à leur usage et au couple compte/workspace. Le navigateur vérifie ce contexte avant de déchiffrer, afin de refuser un échange de ciphertext entre comptes ou workspaces. Aucun champ ne permet de réduire les itérations. Le ciphertext, les clés enveloppées, IV et sel sont stockés ; phrase et clé de récupération ne le sont jamais.
+
+Le compte et le nom du workspace restent visibles. Les outils cloud voient leurs entrées ; le relais runner voit ses messages. Les résultats restaurés ne déclenchent pas d’exécution. La protection E2EE ne protège pas contre XSS, poste compromis ou bibliothèque malveillante. Aucun stockage local automatique des données déchiffrées. La phrase du compte Supabase n’intervient pas : modifier ce mot de passe ne change pas la clé. Chaque nouvelle sauvegarde génère une nouvelle clé de récupération, qui doit être conservée ; conserver les anciennes pour les anciens exports/snapshots.
+
+Multi-appareils : même compte et phrase, ou clé de récupération correspondante. Récupération ouvre les données ; les sauvegarder avec une nouvelle phrase produit une nouvelle enveloppe. Conflits de version refusés par le backend ; recharger avant de sauvegarder. Les migrations RLS restent à appliquer et tester dans Supabase.
