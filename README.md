@@ -1,46 +1,30 @@
-# Cyber Workbench
+<div align="center">
 
-> A modular cybersecurity workbench: browser-side analysis tools, passive cloud lookups and a sandboxed Go runner behind a single interface.
+<img src="./.github/banner.svg" alt="Cyber Workbench" width="100%">
 
-![Status](https://img.shields.io/badge/status-showcase-38f0c0?style=flat-square)
-![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)
-![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white)
+**A modular cybersecurity workbench: browser-side analysis tools, passive cloud lookups and a sandboxed Go runner behind a single interface.**
 
-> **ℹ️ Showcase repository.** This is the *public skeleton* of a private project: it shows the architecture, the service boundaries and the technical choices. The tool implementations, the network logic and the key features stay private — every endpoint here is a stub that answers `501 Not Implemented`.
+![Status](https://img.shields.io/badge/status-showcase-38f0c0?style=flat-square) ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white) ![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white) ![Go](https://img.shields.io/badge/Go-1.22+-00ADD8?style=flat-square&logo=go&logoColor=white)
 
----
+[Overview](#-overview) · [Architecture](#-architecture) · [Getting started](#-getting-started) · [Tech stack](#-tech-stack)
 
-## Table of contents
+</div>
 
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [What this repository contains](#what-this-repository-contains)
-- [Documented target platform](#documented-target-platform)
-- [Getting started](#getting-started)
-- [Project structure](#project-structure)
-- [Tech stack](#tech-stack)
-- [Design principles](#design-principles)
+> [!IMPORTANT]
+> **Showcase repository.** This is the *public skeleton* of a private project: it shows the architecture, the service boundaries and the technical choices. The tool implementations, the network logic and the key features stay private — every endpoint here is a stub that answers `501 Not Implemented`.
 
-## Overview
+## 📖 Overview
 
 Cyber Workbench is designed as a single workspace where security analysts run small, focused tools: decode and inspect data, analyse headers and certificates, look up passive OSINT sources, and run network checks through a local runner. The goal is a consistent interface and a strict execution contract for every tool, rather than a pile of unrelated scripts.
 
-## Architecture
+## 🏗️ Architecture
 
-```text
-┌──────────────────────┐        HTTPS         ┌─────────────────────────┐
-│  Frontend (Next.js)  │ ───────────────────► │   API (FastAPI)         │
-│  React + TypeScript  │                      │   /health               │
-│  tool catalogue, UI  │ ◄─────────────────── │   /api/tools/*          │
-└──────────────────────┘                      └────────────┬────────────┘
-                                                           │ dispatch
-                                              ┌────────────▼────────────┐
-                                              │   Runner (Go)           │
-                                              │   sandboxed network     │
-                                              │   checks (tcp, tls)     │
-                                              └─────────────────────────┘
+```mermaid
+flowchart LR
+    UI["🖥️ Frontend<br/>Next.js · React · TypeScript"] -->|HTTPS| API["⚙️ API<br/>FastAPI"]
+    API -->|dispatch| RUN["🔒 Runner<br/>Go · sandboxed network checks"]
+    API -.->|passive lookups| CLOUD[("☁️ Public sources<br/>DNS · RDAP · TLS")]
+    UI -.->|offline analysis| BROWSER["🧩 Browser tools<br/>client-side JavaScript"]
 ```
 
 Three execution modes are described in the design documents:
@@ -51,7 +35,7 @@ Three execution modes are described in the design documents:
 | **Cloud** | Backend, passive only | Public lookups (DNS, RDAP, certificate fetch) with anti-SSRF validation |
 | **Runner** | Local Go binary | Network checks that must originate from the user's own machine |
 
-## What this repository contains
+## 📦 What this repository contains
 
 | Component | Status in this repository |
 |---|---|
@@ -65,7 +49,7 @@ Three execution modes are described in the design documents:
 
 The older documents in `docs/` describe the *target* private architecture. They are not features shipped in this repository. Supabase integration, orchestration and the advanced tools are **not** implemented here, and the historical `compose.yaml` does not apply to this skeleton — use the commands below.
 
-## Documented target platform
+## 🗺️ Documented target platform
 
 The design documents ([`PRD.MD`](PRD.MD), [`ETAT_PROJET.md`](ETAT_PROJET.md), [`docs/CATALOGUE_OUTILS.md`](docs/CATALOGUE_OUTILS.md), [`docs/E2EE.md`](docs/E2EE.md)) describe the full platform:
 
@@ -75,7 +59,7 @@ The design documents ([`PRD.MD`](PRD.MD), [`ETAT_PROJET.md`](ETAT_PROJET.md), [`
 - A strict **execution contract** per tool: declared inputs, size limits and output format.
 - Privacy by design: pasted data stays client side whenever the tool allows it.
 
-## Getting started
+## 🚀 Getting started
 
 **Prerequisites:** Python 3.11+, Node.js 22+ with npm, Go 1.22+. No secret or external service is required.
 
@@ -115,7 +99,7 @@ go run . tls-audit
 
 Each recognised command prints `not implemented` and exits with a deliberate failure code. No scan or audit is performed.
 
-## Project structure
+## 🗂️ Project structure
 
 ```text
 backend/app/main.py          API entry point and health check
@@ -127,11 +111,11 @@ docs/                        Historical architecture documentation
 config/ scripts/ supabase/   Reserved placeholders
 ```
 
-## Tech stack
+## 🧰 Tech stack
 
 Next.js · React · TypeScript · FastAPI · Pydantic Settings · Go
 
-## Design principles
+## 🧭 Design principles
 
 - **Explicit execution contracts** — every tool declares what it accepts and returns.
 - **Least privilege** — network access is isolated in a separate runner process.
@@ -140,4 +124,8 @@ Next.js · React · TypeScript · FastAPI · Pydantic Settings · Go
 
 ---
 
-**Author** — Konaté Adama · [github.com/DaskoStudio](https://github.com/DaskoStudio)
+<div align="center">
+
+<sub>Built by <a href="https://github.com/DaskoStudio"><b>Konaté Adama</b></a> · <a href="https://github.com/DaskoStudio?tab=repositories">More projects</a></sub>
+
+</div>
